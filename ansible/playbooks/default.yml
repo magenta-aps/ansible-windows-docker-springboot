@@ -1,0 +1,9 @@
+# Playbook for server
+---
+
+- hosts: default
+
+  roles:
+  - ping
+
+...

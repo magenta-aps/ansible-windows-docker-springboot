@@ -1,0 +1,6 @@
+---
+# tasks file for vim
+  - name: Ping the Windows Server
+    win_ping:
+
+...
