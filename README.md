@@ -42,7 +42,6 @@ We can now register this image with vagrant, by using:
 
     vagrant box add gen-windows-box/windows_2016_docker_virtualbox.box \
                     --name "windows-server-2016" \
-                    --box-version 2016 \
                     --provider virtualbox
 
 If successfull, you'll see the line:
