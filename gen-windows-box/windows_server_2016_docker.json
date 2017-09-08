@@ -8,13 +8,13 @@
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "iso_checksum": "{{user `iso_checksum`}}",
       "headless": false,
-      "boot_wait": "2m",
+      "boot_wait": "10m",
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout": "6h",
       "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "post_shutdown_delay": "10s",
-      "guest_os_type": "Windows2016_64",
+      "guest_os_type": "Other_64",
       "guest_additions_mode": "attach",
       "disk_size": 61440,
       "floppy_files": [
@@ -25,7 +25,9 @@
       "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--memory", "4096"],
         ["modifyvm", "{{.Name}}", "--cpus", "4"],
-        ["modifyvm", "{{.Name}}", "--vram", "32"]
+        ["modifyvm", "{{.Name}}", "--vram", "32"],
+        ["modifyvm", "{{.Name}}", "--paravirtprovider", "kvm"],
+        ["modifyvm", "{{.Name}}", "--nictype1", "82545EM"]
       ]
     }
   ],
