@@ -21,74 +21,33 @@ To install Ansible, run:
 Not supported, please figure out a solution yourself, and add it via. a pull
 request.
 
+
 ### Common steps
 
-#### Acquiring the Windows Server image
+#### Acquiring an Ansible-Ready Windows Server box
 
-As Windows images are not distribued freely, we need to acquire a Windows ISO
-file. This can be done
-[here](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2016).
+Whereas with the Linux example, we had freely available Ansible-Ready machine
+images to use, this is not the case for Windows, and as such one must be
+generated.
 
-The version we'll use is the 'Windows Server 2016' 180days evaluation.
-Acquiring the image will require one to sign-up using email.
+To do so, please refer to the [README.md](gen-windows-box/README.md) file
+within the `gen-windows-box` subfolder.
 
-The expected image, is named:
-* `14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO`
+#### Utilizing the Windows Server Box
 
-If your result differs, please contact the author of this repository.
+At this point, it's assumed we have our Windows Server Box 
+`gen-windows-box/windows_2016_docker_virtualbox.box`.
 
-Note: The image is 6.5GB, so it may take a while to download.
+We can now register this image with vagrant, by using:
 
-#### Acquiring packer
-
-To setup the Windows image for Vagrant, we need to utilize `packer`. For Linux,
-it can be acquired [here](https://www.packer.io/), or by running:
-
-    curl -O https://releases.hashicorp.com/packer/1.0.4/packer_1.0.4_linux_amd64.zip
-
-And then unzipped using the `unzip` program:
-
-    unzip packer_1.0.4_linux_amd64.zip
-    rm packer_1.0.4_linux_amd64.zip
-
-#### Building the Vagrant image
-
-At this point, it's assumed that `packer` has been installed, and that the
-Windows Server 2016 ISO image is available.
-
-Place the ISO file, into this folder (along side this README file), and start
-the packer build, using:
-
-    ./packer build -var iso_url=14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO \
-                   -var iso_checksum=70721288bbcdfe3239d8f8c0fae55f1f \
-                    windows_server_2016_docker.json
-
-
-##ADAD
-
-
-At this point are environment should be setup, and we can acquire a Windows
-virtual-box image, from
-[here](https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/).
-
-Note: Make sure to download the 'MSEdge on Win10 (x64) Stable (xx.xxxxx)' with
-      platform chosen as 'Vagrant'.
-
-The resulting file should be: 'MSEdge.Win10.RS2.Vagrant.zip', move it to this
-folder (along side this script), and extract it using:
-
-    unzip MSEdge.Win10.RS2.VirtualBox.zip
-    rm MSEdge.Win10.RS2.VirtualBox.zip
-    mv "MSEdge - Win10_preview.box" win10-preview.box
-
-At which point, the virtual machine image, should be available as
-`win10-preview.box`. And can now be added to vagrant, using:
-
-    vagrant box add win10-preview.box --name "windows10"
+    vagrant box add gen-windows-box/windows_2016_docker_virtualbox.box \
+                    --name "windows-server" \
+                    --box-version 2016 \
+                    --provider virtualbox
 
 If successfull, you'll see the line:
 
-    ==> box: Successfully added box 'windows10' (v0) for 'virtualbox'!
+    ==> box: Successfully added box 'windows-server-2016' (v0) for 'virtualbox'!
 
 Now to communicate with windows, we'll utilize
 [WinRM (Windows Remote Management)](https://technet.microsoft.com/en-us/library/ff700227.aspx)
@@ -97,27 +56,44 @@ instead of SSH, and as such; we need to install a few vagrant plugins:
     vagrant plugin install winrm
     vagrant plugin install winrm-fs
 
+Note: Installing these, may require you to install ´zlib1g-dev`.
+
 As there seems to be issues with the most recent winrm ruby gem, we'll install
 a specific version, instead:
 
     vagrant plugin install winrm --plugin-version 1.8.1
 
-At which point, the virtual machine is configured to start up.
+At which point, we're ready to run the virtual machine.
 
-## Usage:
+## Provisioning:
 
-Simply run `vagrant up`, and wait for the machine to be available.
+To provision the machine using Ansible we need to install `pywinrm`, we can do
+this by running:
 
-A virtualbox windows will pop-up and allow you to configure the rest of the
-steps, namely the steps required in order to make Windows support Anisble
-provisioning.
+    apt-get install python-winrm
+    pip install --upgrade pywinrm
 
-## Privisioning:
+After this is done, the machine can be provisioned manually by running:
+
+    vagrant provision
+
+After the machine is up, or as a part of the VM setup process, when running:
+
+    vagrant up
 
 
+## Quirks:
+### Installing winrm plugins fails.
 
-## Usage2:
+It is a known issue, that installing the vagrant plugins, can result in an
+issue, alike the one below:
 
-After this, the machine can be accessed over ssh, using:
+    Installing the "winrm --version '1.8.1'" plugin. This can take a few minutes...
+    /usr/lib/ruby/2.3.0/rubygems/specification.rb:946:in `all=':
+        undefined method `group_by' for nil:NilClass (NoMethodError)
+    ...
 
-    vagrant ssh
+The solution to this issue, is running code of the internet:
+
+    sed -i'' "s/Specification.all = nil/Specification.reset/" \
+        /usr/lib/ruby/vendor_ruby/vagrant/bundler.rb
