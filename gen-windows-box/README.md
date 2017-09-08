@@ -41,3 +41,6 @@ All that's left to do now, is let packer run, and create our Windows virtualbox
 image, this can be done by running:
 
     ./setup.sh
+
+If everything goes as planned, you should end up with the file
+`windows_2016_docker_virtualbox.box` next to this README file.

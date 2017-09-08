@@ -6,3 +6,6 @@ image/*.ISO
 # Building tmp files
 output-virtualbox-iso/
 packer_cache/
+
+# Output file
+windows_2016_docker_virtualbox.box
