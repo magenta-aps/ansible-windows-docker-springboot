@@ -1,2 +1,8 @@
+# Binary files
 tools/packer
-image/
+image/*.iso
+image/*.ISO
+
+# Building tmp files
+output-virtualbox-iso/
+packer_cache/
