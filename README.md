@@ -1,6 +1,8 @@
 Vagrant-Ansible Example (Windows)
 =================================
 
+**NOTE: This project is currently outdated**
+
 Example project for running Ansible, inside a newly created Windows virtual machine.
 
 For the Unix equivalent, see [here](https://github.com/magenta-aps/vagrant-ansible-example)
